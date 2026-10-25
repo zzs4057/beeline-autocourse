@@ -1,0 +1,31 @@
+{
+  "name": "beeline-autocourse",
+  "version": "1.4.0",
+  "description": "A compliance-focused Beeline course navigation userscript.",
+  "author": "Beeline Autocourse Contributors",
+  "keywords": [
+    "beeline-ai",
+    "beeline-autocourse",
+    "xinwei",
+    "auto-course",
+    "automatic-course",
+    "course-autoplay",
+    "course-navigation",
+    "courseware",
+    "tampermonkey",
+    "userscript"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zzs4057/beeline-autocourse.git"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node --check beeline-autocourse.user.js",
+    "test": "node tests/run-all.mjs"
+  }
+}
