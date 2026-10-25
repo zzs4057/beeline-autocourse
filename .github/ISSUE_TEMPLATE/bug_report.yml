@@ -1,0 +1,41 @@
+name: Bug report
+description: Report a reproducible course-navigation issue.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include account credentials, cookies, tokens, or unsanitized HAR files.
+  - type: input
+    id: version
+    attributes:
+      label: Script version
+      placeholder: v1.4.0
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      placeholder: Describe the page state and exact actions.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and sanitized logs
+    validations:
+      required: true
+  - type: textarea
+    id: dom
+    attributes:
+      label: Sanitized DOM or screenshots
+      description: Remove names, tokens, signed URLs, and other private data before posting.
