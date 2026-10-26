@@ -718,5 +718,30 @@ console.log('\n测试 18：空节点无高亮时仍可继续');
     '下一视频点击 ' + (page.sections[2].clicked || 0) + ' 次');
 }
 
+// ===== 19. 自定义完成百分比：未达到时不得跳节 =====
+console.log('\n测试 19：自定义完成百分比未达到时不跳节');
+{
+  timers.length = 0;
+  const page = buildPage({ duration: 528, currentTime: 100, activeState: 'progress' });
+  const { sb } = run(SRC, page);
+  sb.__cfg.completionPercent = 80;
+  advance(5000);
+  ok('低于设定百分比仍保持播放', (page.nextBtn.clicked || 0) === 0,
+    '进度 ' + Math.round(page.video.currentTime) + '/528s，点击 ' + (page.nextBtn.clicked || 0) + ' 次');
+}
+
+// ===== 20. 自定义完成百分比：达到后自动下一视频 =====
+console.log('\n测试 20：达到自定义完成百分比后自动跳节');
+{
+  timers.length = 0;
+  const page = buildPage({ duration: 528, currentTime: 430, activeState: 'progress' });
+  const { sb } = run(SRC, page);
+  sb.__cfg.completionPercent = 80;
+  sb.__cfg.minWatch = 0;
+  advance(5000);
+  ok('达到80%后触发下一视频', (page.nextBtn.clicked || 0) > 0,
+    '进度 ' + Math.round(page.video.currentTime) + '/528s，点击 ' + (page.nextBtn.clicked || 0) + ' 次');
+}
+
 console.log('\n结果：' + checks.filter(Boolean).length + '/' + checks.length + ' 通过');
 process.exitCode = checks.some((c) => !c) ? 1 : 0;

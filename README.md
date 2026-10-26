@@ -4,7 +4,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-yellow.svg)
 ![Userscript](https://img.shields.io/badge/userscript-Tampermonkey%20%7C%20Violentmonkey-blue)
-![Version](https://img.shields.io/badge/version-1.4.1-green)
+![Version](https://img.shields.io/badge/version-1.4.2-green)
 
 一个面向 `beeline-ai.com` 芯位蜜线课程学习页的 Tampermonkey / Violentmonkey 技术演示脚本。总开关默认关闭；在用户显式开启且课程窗口保持前台时，脚本才通过可见 DOM 辅助章节导航。脚本不伪造页面可见性，不模拟键鼠，不自动处理风控弹窗，不调用平台学习接口，也不修改课程数据。
 
@@ -26,6 +26,7 @@
 - 当下一视频位于折叠章节时，先展开相邻章节，再重新定位。
 - 多个 `<video>` 并存时，只使用当前可见或正在播放的主视频。
 - 视频加载、缓冲、`seeking` 或显示 loading spinner 时不判定为完成。
+- 可填写完成进度百分比；主视频达到该进度后自动进入下一视频，默认 `100%`。
 - 课程窗口失焦时暂停自动操作，恢复前台后再继续。
 - 提供控制面板、运行日志、页面结构诊断和手动跳转入口。
 
@@ -88,6 +89,7 @@ https://beeline-ai.com/*
 | 默认倍速 | `1x` | 建议遵守课程平台规则 |
 | 扫描间隔 | `10s` | 独立扫描下一章节入口 |
 | 静态课件停留 | `5s` | 等待文档查看器渲染 |
+| 完成进度 | `100%` | 达到该播放百分比后进入下一视频 |
 
 ## 已知限制
 

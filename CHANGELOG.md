@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.2] - 2026-10-26
+
+### Added
+
+- Added a configurable completion percentage. The current primary video is
+  considered complete after reaching the configured percentage.
+
 ## [1.4.1] - 2026-10-25
 
 ### Security and compliance

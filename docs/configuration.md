@@ -16,6 +16,7 @@ Configuration is stored in browser `localStorage` under `BL_COURSE_CFG_V1`.
 | `clickDelayMax` | `2.5` | Maximum click delay |
 | `interval` | `0.5` | Main tick interval |
 | `endThreshold` | `1` | End-of-video threshold in seconds |
+| `completionPercent` | `100` | Completion target as a percentage of video duration |
 | `playRate` | `1` | Playback rate |
 
 Invalid values are repaired by `sanitizeConfig()` and fall back to safe defaults.

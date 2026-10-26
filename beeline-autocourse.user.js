@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         芯位蜜线课程连播与章节导航助手
-// @version      1.4.1
+// @version      1.4.2
 // @description  通过页面 DOM 辅助课程连播与章节导航。默认关闭，必须由用户在课程窗口前台手动启用；不伪造可见性、不模拟键鼠、不处理或规避平台风控。
 // @author       Beeline Autocourse Contributors
 // @match        https://www.beeline-ai.com/*
@@ -16,7 +16,7 @@
   if (window.top !== window.self) return;
   if (window.__BL_COURSE_LOADED__) return;
   window.__BL_COURSE_LOADED__ = true;
-  const SCRIPT_VERSION = '1.4.1';
+  const SCRIPT_VERSION = '1.4.2';
 
   // ==========================================================================
   //  0. 配置
@@ -35,6 +35,7 @@
     guardSkipAhead: true, // 防跳过头：视频未到末尾时不自动跳
     interval: 0.5,        // 主循环间隔（秒）——立即模式需要更密的检测
     endThreshold: 1.0,    // 距末尾多少秒算看完
+    completionPercent: 100, // 播放到该百分比视为达到完成目标
     playRate: 1.0,        // 播放倍速（1.0=正常；可试 1.5 / 2.0）
     skipCourseware: false,// 课件是否可跳过由用户显式决定
   };
@@ -55,6 +56,7 @@
     minWatch: [0, 3600],
     pptDwell: [0, 3600],
     endThreshold: [0.1, 60],
+    completionPercent: [1, 100],
     playRate: [0.25, 4],
     interval: [0.2, 60],
   };
@@ -547,11 +549,15 @@
     const remaining = duration > 0 ? Math.max(0, duration - currentTime) : Infinity;
     const readyState = isFinite(v.readyState) ? Number(v.readyState) : 4;
     const loading = !!v.seeking || readyState < 3 || hasVisibleLoadingIndicator();
-    const atEnd = !!v.ended || (duration > 0 && remaining <= Math.max(0.5, cfg.endThreshold || 1));
+    const completionPercent = Math.max(1, Math.min(100, Number(cfg.completionPercent) || 100));
+    const targetTime = duration > 0 ? duration * completionPercent / 100 : Infinity;
+    const progressPercent = duration > 0 ? currentTime / duration * 100 : 0;
+    const atTarget = !!v.ended || (duration > 0 &&
+      (currentTime >= targetTime || remaining <= Math.max(0.5, cfg.endThreshold || 1)));
     const key = (v.currentSrc || v.src || '') + '|' + Math.round(duration * 10);
     const now = Date.now();
 
-    if (!atEnd || loading) {
+    if (!atTarget || loading) {
       finishCandidateVideo = v;
       finishCandidateKey = key;
       finishCandidateSince = 0;
@@ -563,11 +569,12 @@
 
     const finishStable = finishCandidateVideo === v && finishCandidateKey === key &&
       finishCandidateSince > 0 && now - finishCandidateSince >= 1500;
-    const finished = atEnd && !loading && finishStable;
-    return { hasVideo: true, finished, loading, readyState, currentTime, duration, remaining, video: v };
+    const finished = atTarget && !loading && finishStable;
+    return { hasVideo: true, finished, loading, readyState, currentTime, duration, remaining,
+      progressPercent, completionPercent, targetTime, video: v };
   }
 
-  // 当前视频是否已播到末尾
+  // 当前视频是否达到配置的完成百分比
   function videoFinished() {
     return playbackProgressState().finished;
   }
@@ -1830,6 +1837,7 @@
         num('跳节冷却(秒)', 'bl-cooldown', cfg.cooldown, 1) +
         num('最少观看(秒)', 'bl-minWatch', cfg.minWatch, 5) +
         num('静态课件停留(秒)', 'bl-pptDwell', cfg.pptDwell, 1) +
+        num('完成进度(%)', 'bl-completionPercent', cfg.completionPercent, 1) +
         num('末尾阈值(秒)', 'bl-endThreshold', cfg.endThreshold, 0.5), true) +
 
       fold('⚙️ 播放',
@@ -1945,7 +1953,7 @@
         if (k === 'enabled') updateHeadDot();
       });
     }
-    const nums = ['minWatch', 'pptDwell', 'cooldown', 'interval', 'endThreshold', 'playRate',
+    const nums = ['minWatch', 'pptDwell', 'cooldown', 'interval', 'endThreshold', 'completionPercent', 'playRate',
       'scanEvery', 'clickDelayMin', 'clickDelayMax'];
     for (const k of nums) {
       bindOrSkip('bl-' + k, 'change', (e) => {
