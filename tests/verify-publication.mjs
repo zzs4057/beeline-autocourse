@@ -32,6 +32,8 @@ ok('no visibility or focus spoofing',
 ok('no simulated input or anti-detection loop',
   !/simulateActivity|humanPause|humanSeekBack/.test(source) &&
   !/new KeyboardEvent|window\.scrollBy|movementX/.test(source));
+ok('no programmatic video pause',
+  !/\.pause\s*\(/.test(source));
 ok('no anomaly auto-refresh handler',
   !/handleAnomaly|detectAnomaly|location\.reload\s*\(/.test(source));
 ok('no media prototype or playback-rate interception',

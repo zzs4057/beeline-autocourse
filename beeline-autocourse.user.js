@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         芯位蜜线课程连播与章节导航助手
-// @version      1.4.2
+// @version      1.4.3
 // @description  通过页面 DOM 辅助课程连播与章节导航。默认关闭，必须由用户在课程窗口前台手动启用；不伪造可见性、不模拟键鼠、不处理或规避平台风控。
 // @author       Beeline Autocourse Contributors
 // @match        https://www.beeline-ai.com/*
@@ -16,7 +16,7 @@
   if (window.top !== window.self) return;
   if (window.__BL_COURSE_LOADED__) return;
   window.__BL_COURSE_LOADED__ = true;
-  const SCRIPT_VERSION = '1.4.2';
+  const SCRIPT_VERSION = '1.4.3';
 
   // ==========================================================================
   //  0. 配置
@@ -208,7 +208,6 @@
   // ==========================================================================
   //  2. 前台播放守卫：不伪造可见性，失焦时停止自动化
   // ==========================================================================
-  let foregroundAutoPaused = false;
   let foregroundWarningLogged = false;
 
   function isForegroundActive() {
@@ -220,21 +219,12 @@
     }
   }
 
-  function pauseForBackground() {
-    const v = mainVideo();
-    if (v && !v.paused && !v.ended) {
-      foregroundAutoPaused = true;
-      try { v.pause(); } catch (e) {}
-    }
-  }
-
   function installForegroundGuard() {
     const check = () => {
       if (!isForegroundActive()) {
-        pauseForBackground();
         if (!foregroundWarningLogged) {
           foregroundWarningLogged = true;
-          log('课程窗口不在前台，已暂停自动操作；请保持播放器窗口在最上方');
+          log('课程窗口不在前台，已暂停自动点击；播放器状态不会被脚本修改');
         }
       }
     };
@@ -243,10 +233,6 @@
     try {
       window.addEventListener('focus', () => {
         foregroundWarningLogged = false;
-        if (foregroundAutoPaused) {
-          foregroundAutoPaused = false;
-          if (cfg.autoPlay) keepPlay();
-        }
       });
     } catch (e) {}
   }
@@ -1179,10 +1165,9 @@
     if (!cfg.enabled) { updateStatus(); return; }
 
     if (!isForegroundActive()) {
-      pauseForBackground();
       if (!foregroundWarningLogged) {
         foregroundWarningLogged = true;
-        log('课程窗口不在前台，已暂停自动操作；请保持播放器窗口在最上方');
+        log('课程窗口不在前台，已暂停自动点击；播放器状态不会被脚本修改');
       }
       updateStatus();
       return;
@@ -2136,7 +2121,7 @@
     }
     try { installForegroundGuard(); } catch (e) {}
     log('脚本已启动（芯位蜜线专用版 v' + SCRIPT_VERSION + '）');
-    log('前台守卫已启用：课程窗口失焦时会暂停自动操作');
+    log('前台守卫已启用：失焦时仅停止自动点击，不会暂停视频');
 
     // 启动时播报关键开关状态
     try {

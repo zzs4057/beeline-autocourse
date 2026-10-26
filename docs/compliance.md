@@ -16,7 +16,10 @@ Reference:
 - Reading visible course structure.
 - Clicking normal page controls available to the user.
 - Detecting loading states and refusing premature jumps.
-- Pausing automation when the page is not foreground.
+- Pausing automatic clicks when the page is not foreground.
+
+The release edition never calls `video.pause()` and does not change the
+player's paused state.
 
 ## Not implemented
 

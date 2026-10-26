@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.4.3] - 2026-10-26
+
+### Fixed
+
+- Removed all programmatic video pause calls from the release edition.
+- Foreground loss now stops automatic clicking only; it no longer changes the
+  player's paused state.
+
 ## [1.4.2] - 2026-10-26
 
 ### Added
